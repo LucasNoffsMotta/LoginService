@@ -1,4 +1,4 @@
-GET http://localhost:5074/User/CreateUser
+POST  http://localhost:5074/user/createuser
 Content-Type: application/json
 
 {
@@ -9,3 +9,6 @@ Content-Type: application/json
     "number": 694,
     "postalCode":"04119-060"
 }
+
+###
+GET http://localhost:5074/User/Test

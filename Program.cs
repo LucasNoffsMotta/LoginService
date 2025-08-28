@@ -10,11 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<LoginServiceContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LoginServiceContext") ?? throw new InvalidOperationException("Connection string 'LoginServiceContext' not found.")));
 
-
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<ILoginHelper, LoginHelper>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddControllers();
-var app = builder.Build();
 
+var app = builder.Build();
+app.MapControllers();
 app.Run();

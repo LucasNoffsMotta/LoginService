@@ -21,6 +21,7 @@ public class UserRepo : IUserRepo
     public void CreateUser(User user)
     {
         _dbContext.User.Add(user);
+        
         _dbContext.SaveChangesAsync();
     }
 }
