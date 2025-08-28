@@ -1,0 +1,11 @@
+GET http://localhost:5074/User/CreateUser
+Content-Type: application/json
+
+{
+    "username":"Lucas",
+    "password": "1234",
+    "email":"lnoffs@hotmail.com",
+    "street":"Rua Afonso Celso",
+    "number": 694,
+    "postalCode":"04119-060"
+}
