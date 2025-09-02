@@ -55,10 +55,7 @@ namespace LoginService.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AdressId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AdressId1")
+                    b.Property<int?>("AdressId")
                         .HasColumnType("int");
 
                     b.Property<DateOnly>("Birth")
@@ -75,7 +72,7 @@ namespace LoginService.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdressId1");
+                    b.HasIndex("AdressId");
 
                     b.ToTable("User");
                 });
@@ -84,7 +81,7 @@ namespace LoginService.Migrations
                 {
                     b.HasOne("LoginService.Models.Adress", "Adress")
                         .WithMany()
-                        .HasForeignKey("AdressId1");
+                        .HasForeignKey("AdressId");
 
                     b.Navigation("Adress");
                 });

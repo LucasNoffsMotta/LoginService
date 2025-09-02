@@ -1,12 +1,14 @@
 using System;
 using LoginService.Data;
 using LoginService.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LoginService.Repo;
 
 public interface IUserRepo
 {
-    public void CreateUser(User user);
+    public Task CreateUser(User user);
+    public Task<List<string?>> GetUsers();
 }
 
 public class UserRepo : IUserRepo
@@ -18,10 +20,17 @@ public class UserRepo : IUserRepo
         _dbContext = dbContext;
     }
 
-    public void CreateUser(User user)
+    public Task<List<string?>> GetUsers()
     {
-        _dbContext.User.Add(user);
-        
-        _dbContext.SaveChangesAsync();
+        return _dbContext.User
+        .Select(u => u.Username)
+        .ToListAsync();
+    }
+
+
+    public async Task CreateUser(User user)
+    {
+        _dbContext.Add(user);
+        await _dbContext.SaveChangesAsync();
     }
 }

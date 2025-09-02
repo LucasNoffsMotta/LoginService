@@ -9,6 +9,5 @@ public class User : ModelBase
     public string? Email { get; set; }
     public DateOnly Birth { get; set; }
     public Adress? Adress { get; set; }
-
-    public int AdressId { get; set; }
+    public int? AdressId { get; set; }
 }

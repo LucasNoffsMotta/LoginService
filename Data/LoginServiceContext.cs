@@ -16,6 +16,9 @@ public class LoginServiceContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<User>()
+        .HasOne(u => u.Adress)
+        .WithMany()
+        .HasForeignKey(u => u.AdressId);
     }
 }

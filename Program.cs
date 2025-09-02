@@ -15,6 +15,27 @@ builder.Services.AddScoped<ILoginHelper, LoginHelper>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddControllers();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
+
+
 var app = builder.Build();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<LoginServiceContext>();
+    if (!await db.Database.CanConnectAsync())
+    {
+        throw new Exception("Não foi possível conectar ao banco LoginService");
+    }
+
+    else
+    {
+        Console.WriteLine("Conectado");
+    }
+}
+
 app.Run();
