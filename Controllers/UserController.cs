@@ -36,15 +36,20 @@ public class UserController
     }
 
     [HttpPost("createuser")]
-    public ActionResult CreateUser([FromForm] string username, [FromForm] string password, [FromForm]string email, [FromForm] string birth)
+    public ActionResult CreateUser([FromForm] string username, [FromForm] string password, [FromForm] string email, [FromForm] string birth)
     {
-        User user = new User();
-        var hashedPassowrd = _loginHelper.HashPassword(user, password);
-        user.Username = username;
-        user.Birth = DateOnly.Parse(birth);
-        user.Password = hashedPassowrd;
-        user.Email = email;
-        _userRepo.CreateUser(user);
-        return new OkObjectResult(200);
+        if (_userRepo.ValidEmail(email) && _userRepo.ValidUsername(username))
+        {
+            User user = new User()
+            {
+                Username = username,
+                Birth = DateOnly.Parse(birth),
+                Password = _loginHelper.HashPassword(new User(), password),
+                Email = email
+            };
+            _userRepo.CreateUser(user);
+            return new OkObjectResult(user);
+        }
+        return new OkObjectResult(400);
     }
 }

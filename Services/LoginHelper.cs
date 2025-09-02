@@ -15,11 +15,11 @@ public class LoginHelper : ILoginHelper
 
     public string HashPassword(User user, string providedPassword)
     {
-        return _passwordHasher.HashPassword(user, providedPassword);        
+        return _passwordHasher.HashPassword(user, providedPassword);
     }
 
     public bool VerifyPassword(User user, string hashedPassowrd, string providedPassword)
     {
         throw new NotImplementedException();
-    }
+    }  
 }
