@@ -20,6 +20,7 @@ public class LoginHelper : ILoginHelper
 
     public bool VerifyPassword(User user, string hashedPassowrd, string providedPassword)
     {
-        throw new NotImplementedException();
+        var result = _passwordHasher.VerifyHashedPassword(user, hashedPassowrd, providedPassword);
+        return result == PasswordVerificationResult.Success;
     }  
 }

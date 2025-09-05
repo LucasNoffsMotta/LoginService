@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using LoginService.Data;
 using LoginService.Models;
 using LoginService.Repo;
@@ -21,35 +22,42 @@ public class UserController
         _userRepo = userRepo;
     }
 
-    [HttpPost("login")]
-    public ActionResult Login([FromBody] string username, string password)
+    [HttpGet("login")]
+    public ActionResult Login([FromForm] string username, [FromForm] string password)
     {
-        return new OkObjectResult(200);
+        if (_userRepo.UniqueUsername(username))
+        {
+            return new BadRequestResult();
+        }
+
+        var user = _userRepo.GetUser(username);
+
+        if (!_loginHelper.VerifyPassword(user!, user!.Password!, password))
+        {
+            return new BadRequestResult();
+        }
+
+        return new OkObjectResult(user);
     }
 
-    [HttpGet("users")]
-    public ActionResult GetUsers()
-    {
-        var userList = _userRepo.GetUsers();
-        Console.WriteLine(userList);
-        return new OkObjectResult(200);
-    }
 
     [HttpPost("createuser")]
-    public ActionResult CreateUser([FromForm] string username, [FromForm] string password, [FromForm] string email, [FromForm] string birth)
+    public async Task<ActionResult> CreateUser([FromForm] string username, [FromForm] string password, [FromForm] string email, [FromForm] string birth)
     {
-        if (_userRepo.ValidEmail(email) && _userRepo.ValidUsername(username))
+        if (_userRepo.UniqueEmail(email) && _userRepo.UniqueUsername(username))
         {
             User user = new User()
             {
                 Username = username,
                 Birth = DateOnly.Parse(birth),
-                Password = _loginHelper.HashPassword(new User(), password),
+                Password = string.Empty,
                 Email = email
             };
-            _userRepo.CreateUser(user);
-            return new OkObjectResult(user);
+
+            user.Password = _loginHelper.HashPassword(user, password);
+            var createdUser = await _userRepo.CreateUser(user);
+            return new OkObjectResult(createdUser);
         }
-        return new OkObjectResult(400);
+        return new BadRequestResult();
     }
 }
