@@ -12,7 +12,7 @@ public interface IUserRepo
     public Task<List<string?>> GetUsers();
     public bool UniqueUsername(string providedUsername);
     public bool UniqueEmail(string providedEmail);
-    public User? GetUser(string userName);
+    public Task<User?> GetUser(string userName);
 }
 
 public class UserRepo : IUserRepo
@@ -33,14 +33,14 @@ public class UserRepo : IUserRepo
 
     public bool UniqueUsername(string providedUsername)
     {
-        var userNames = _dbContext.User.Where(u => u.Username == providedUsername).Select(u => u.Id);
-        return userNames.IsNullOrEmpty();
+        var userName = _dbContext.User.Where(u => u.Username == providedUsername).Select(u => u.Id);
+        return userName.IsNullOrEmpty();
     }
 
     public bool UniqueEmail(string providedEmail)
     {
-        var emails = _dbContext.User.Where(u => u.Email == providedEmail);
-        return emails.IsNullOrEmpty();
+        var email = _dbContext.User.Where(u => u.Email == providedEmail);
+        return email.IsNullOrEmpty();
     }
 
     public async Task<User> CreateUser(User user)
@@ -50,10 +50,10 @@ public class UserRepo : IUserRepo
         return user;
     }
 
-    public User? GetUser(string userName)
+    public async Task<User?> GetUser(string userName)
     {
-        return _dbContext.User
-        .FirstOrDefault(user => user.Username == userName)
+        return await _dbContext.User
+        .FirstOrDefaultAsync(user => user.Username == userName)
         ;
     }
 }

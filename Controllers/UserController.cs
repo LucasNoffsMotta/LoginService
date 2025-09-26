@@ -1,6 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using LoginService.Data;
+using LoginService.DTO;
+using LoginService.Error;
+using LoginService.Map;
 using LoginService.Models;
 using LoginService.Repo;
 using LoginService.Services;
@@ -23,41 +26,34 @@ public class UserController
     }
 
     [HttpGet("login")]
-    public ActionResult Login([FromForm] string username, [FromForm] string password)
+    public async Task<ActionResult<User>> Login([FromBody]LoginDTO loginUser)
     {
-        if (_userRepo.UniqueUsername(username))
+        if (_userRepo.UniqueUsername(loginUser.Username))
         {
-            return new BadRequestResult();
+            return new BadRequestObjectResult("Wrong username.");
         }
 
-        var user = _userRepo.GetUser(username);
+        var user = await _userRepo.GetUser(loginUser.Username);
 
-        if (!_loginHelper.VerifyPassword(user!, user!.Password!, password))
+        if (!_loginHelper.VerifyPassword(user!, user!.Password!, loginUser.Password))
         {
-            return new BadRequestResult();
+            return new BadRequestObjectResult("Wrong password." );
         }
 
-        return new OkObjectResult(user);
+        return new OkObjectResult(UserMapping.UserToCreatedDTO(user));
     }
 
-
     [HttpPost("createuser")]
-    public async Task<ActionResult> CreateUser([FromForm] string username, [FromForm] string password, [FromForm] string email, [FromForm] string birth)
+    public async Task<ActionResult> CreateUser([FromBody] NewUserDTO userDTO)
     {
-        if (_userRepo.UniqueEmail(email) && _userRepo.UniqueUsername(username))
-        {
-            User user = new User()
-            {
-                Username = username,
-                Birth = DateOnly.Parse(birth),
-                Password = string.Empty,
-                Email = email
-            };
+        var newUser = UserMapping.UserDtoToModel(userDTO);
 
-            user.Password = _loginHelper.HashPassword(user, password);
-            var createdUser = await _userRepo.CreateUser(user);
-            return new OkObjectResult(createdUser);
+        if (_userRepo.UniqueEmail(newUser.Email!) && _userRepo.UniqueUsername(newUser.Username!))
+        {
+            newUser.Password = _loginHelper.HashPassword(newUser, newUser.Password!);
+            var createdUser = await _userRepo.CreateUser(newUser);
+            return new OkObjectResult(UserMapping.UserToCreatedDTO(newUser));
         }
-        return new BadRequestResult();
+        return new BadRequestObjectResult("Username or email already exists");
     }
 }
