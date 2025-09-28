@@ -9,6 +9,7 @@ using LoginService.Repo;
 using LoginService.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LoginService.Controllers;
 
@@ -18,11 +19,13 @@ public class UserController
 {   
     private ILoginHelper _loginHelper;
     private IUserRepo _userRepo;
+    private IRandomPasswordService _randomPasswordService;
 
-    public UserController(ILoginHelper loginHelper, IUserRepo userRepo)
+    public UserController(ILoginHelper loginHelper, IUserRepo userRepo, IRandomPasswordService randomPasswordService)
     {
         _loginHelper = loginHelper;
         _userRepo = userRepo;
+        _randomPasswordService = randomPasswordService;
     }
 
     [HttpGet("login")]
@@ -47,6 +50,11 @@ public class UserController
     public async Task<ActionResult> CreateUser([FromBody] NewUserDTO userDTO)
     {
         var newUser = UserMapping.UserDtoToModel(userDTO);
+
+        if (newUser.Password.IsNullOrEmpty())
+        {
+            newUser.Password = _randomPasswordService.GenerateRandomPassword(6, true, true);
+        }
 
         if (_userRepo.UniqueEmail(newUser.Email!) && _userRepo.UniqueUsername(newUser.Username!))
         {
