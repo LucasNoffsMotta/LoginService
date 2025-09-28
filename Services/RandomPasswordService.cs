@@ -18,7 +18,9 @@ namespace LoginService.Services
                 if (specialChar)
                 {
                     List<char> thisCharList = charlist[r.Next(0,2)];
-                    password = upperCase ? password + thisCharList[r.Next(0, thisCharList.Count)] : password + thisCharList[r.Next(0, thisCharList.Count)];
+                    string c = thisCharList[r.Next(0, thisCharList.Count)].ToString();
+                    bool upperORNot = r.Next(0, 2) == 1 ? true : false;
+                    password = upperORNot ? password + c : password + c.ToLower();
                 }
             }
             return password;

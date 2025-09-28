@@ -53,7 +53,7 @@ public class UserController
 
         if (newUser.Password.IsNullOrEmpty())
         {
-            newUser.Password = _randomPasswordService.GenerateRandomPassword(6, true, true);
+            newUser.Password = _randomPasswordService.GenerateRandomPassword(50, true, true);
         }
 
         if (_userRepo.UniqueEmail(newUser.Email!) && _userRepo.UniqueUsername(newUser.Username!))
