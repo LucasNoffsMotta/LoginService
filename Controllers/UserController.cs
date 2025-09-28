@@ -51,17 +51,14 @@ public class UserController
     {
         var newUser = UserMapping.UserDtoToModel(userDTO);
 
-        if (newUser.Password.IsNullOrEmpty())
+        if (newUser.Password.IsNullOrEmpty() && _userRepo.UniqueEmail(newUser.Email!) && _userRepo.UniqueUsername(newUser.Username!))
         {
-            newUser.Password = _randomPasswordService.GenerateRandomPassword(50, true, true);
-        }
-
-        if (_userRepo.UniqueEmail(newUser.Email!) && _userRepo.UniqueUsername(newUser.Username!))
-        {
+            newUser.Password = _randomPasswordService.GenerateRandomPassword(10, true, true);
             newUser.Password = _loginHelper.HashPassword(newUser, newUser.Password!);
             var createdUser = await _userRepo.CreateUser(newUser);
             return new OkObjectResult(UserMapping.UserToCreatedDTO(newUser));
         }
+
         return new BadRequestObjectResult("Username or email already exists");
     }
 }
